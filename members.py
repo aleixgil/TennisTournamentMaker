@@ -5,10 +5,28 @@ class Members:
 	def title(self):
 		print("""
 
-		***** SOCIS | CLUB TENNIS SANTPEDOR *****""")
+		***** SOCIS - CLUB TENNIS SANTPEDOR *****""")
+
+	def membersMenu(self, dataClass, data):
+		os.system('clear')
+		self.title()
+		for index, options in enumerate(data["menu-options"][1][1]):
+			print("""
+			{}. {}""".format(index, options))
+		option = input("""
+		Selecciona una opció: """)
+		if option == '1':
+		    self.manageMembers(dataClass, data)
+		elif option == '0':
+			return 1
+		else:
+			print("""
+			Opció NO vàlida!""")
+			time.sleep(1)
+		self.membersMenu(dataClass, data)
 
 	def manageMembers(self, dataClass, data):
-		os.system('cls')
+		os.system('clear')
 		self.title()
 		for id, member in enumerate(data["members"]):
 			print("""

@@ -1,7 +1,6 @@
 from data import *
 from members import *
 import os, time
-import json
 
 class Menu:
 	def __init__(self):
@@ -16,16 +15,16 @@ class Menu:
 		***** CLUB TENNIS SANTPEDOR *****""")
 
 	def principalMenu(self):
-		os.system('cls')
+		os.system('clear')
 		self.title()
 		for index, options in enumerate(self.data["menu-options"]):
 			print("""
-			{}. {}""".format(index, options))
+			{}. {}""".format(index, options[0]))
 		option = input("""
 		Selecciona una opció: """)
 		if option == '1':
 		    # self.fromMenu = True
-		    Members().manageMembers(self.dataClass, self.data)
+		    Members().membersMenu(self.dataClass, self.data)
 		elif option == '2':
 			self.dataClass.showDataPretty()
 		# elif option == '3':

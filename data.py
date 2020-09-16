@@ -34,8 +34,13 @@ class Data:
 	def resetData(self):
 		data = {}
 		data["menu-options"] = [
-			"Sortir!",
-			"Gestionar Socis"
+			["Sortir!"],
+			["Gestionar Socis", [
+				"Tornar al Menú Principal",
+				"Afegir/El·liminar/Modificar Socis",
+				"Ordre Rànquing"
+				]
+			]
 		]
 		data["members"] = []
 		data["tournaments"] = []
@@ -45,7 +50,7 @@ class Data:
 			outfile.close()
 
 	def showDataPretty(self):
-		os.system('cls')
+		os.system('clear')
 		self.title()
 		print(json.dumps(self.data, indent=8))
 		input("""
