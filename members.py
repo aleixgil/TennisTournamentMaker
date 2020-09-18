@@ -53,10 +53,19 @@ class Members:
 		self.manageMembers(dataClass, data)
 
 	def addMember(self, newMember, dataClass, data):
-		data["members"] += [{"id": self.addNewId(data), "name": newMember, "phone": ""}]
+		phone = input("""
+		Afegeix un Núm. de Telèfon o prem ENTER per no afegir-lo ara: """)
+		data["members"] += [{"id": self.addNewId(data), "name": newMember, "phone": phone if len(phone) == 9 else ""}]
 		dataClass.saveData(data)
 		print("""
 			Soci {} afegit!""".format(newMember))
+		if len(phone) == 9:
+			print("""
+			Telèfon {} afegit!""".format(phone))
+		else:
+			print("""
+			La llargada del Telèfon {} és incorrecta. No s'ha afegit cap Telèfon!""".format(phone))
+		time.sleep(2)
 
 	def addNewId(self, data):
 		if data["members"] == []:

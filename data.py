@@ -6,12 +6,6 @@ class Data:
 
 	def __init__(self):
 		self.initData()
-		# self.resetData()
-		# self.data = self.readData()
-		# self.showDataPretty()
-		# self.data["prova"] = []
-		# self.saveData(self.data)
-		# self.showDataPretty()
 
 	def title(self):
 		print("""
@@ -19,7 +13,7 @@ class Data:
 		***** DADES LOCALS | CLUB TENNIS SANTPEDOR *****""")
 
 	def initData(self):
-		if not os.path.exists('dasta.txt'):
+		if not os.path.exists('data.txt'):
 			self.resetData()
 			os.system('clear')
 			print("""
@@ -44,16 +38,22 @@ class Data:
 			["Sortir!"],
 			["Gestionar Socis", [
 				"Tornar al Menú Principal",
-				"Afegir/El·liminar/Modificar Socis",
-				"Ordre Rànquing"
+				"Afegir/El·liminar/Modificar Socis"
+				]
+			],
+			["Gestionar Torneigs", [
+				"Tornar al Menú Principal",
+				"Gestionar Rànquing",
+				"Veure Informació d'un Torneig",
+				"Crear Torneig"
 				]
 			]
 		]
 		data["members"] = [] # [{id: 0, name: "player 1", phone: "123456789"}, {id: 1, name: "player 2", phone: "987654321"}]
-		data["actual-rank"] = [] # [id, id, id, ...]
+		data["rank"] = [] # [id, id, id, ...]
 		data["tournaments"] = []
 
-		with open('dasta.txt', 'w') as outfile:
+		with open('data.txt', 'w') as outfile:
 			json.dump(data, outfile)
 			outfile.close()
 

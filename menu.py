@@ -1,5 +1,6 @@
 from data import *
 from members import *
+from tournaments import *
 import os, time
 
 class Menu:
@@ -22,19 +23,9 @@ class Menu:
 		option = input("""
 		Selecciona una opció: """)
 		if option == '1':
-		    # self.fromMenu = True
 		    Members().membersMenu(self.dataClass, self.data)
 		elif option == '2':
-			self.dataClass.showDataPretty()
-		# elif option == '3':
-		#     self.fromMenu = True
-		#     self.showPlayers()
-		# elif option == '4':
-		#     self.fromMenu = True
-		#     self.addPlayers()
-		# elif option == '5':
-		#     self.fromMenu = True
-		#     self.showGroups()
+			Tournaments().tournamentsMenu(self.dataClass, self.data)
 		elif option == '0':
 			return 1
 		else:
