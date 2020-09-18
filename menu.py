@@ -4,9 +4,8 @@ import os, time
 
 class Menu:
 	def __init__(self):
-		# self.memebers = []
 		self.dataClass = Data()
-		self.data = self.dataClass.getData()
+		self.data = self.dataClass.readData()
 		self.principalMenu()
 
 	def title(self):

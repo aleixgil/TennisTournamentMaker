@@ -28,9 +28,9 @@ class Members:
 	def manageMembers(self, dataClass, data):
 		os.system('clear')
 		self.title()
-		for id, member in enumerate(data["members"]):
+		for member in data["members"]:
 			print("""
-			{} {}""".format(id, member))
+			{}. {} - {}""".format(member["id"], member["name"], member["phone"]))
 
 		option = input("""
 		Escriu +Nom Cognom per afegir un soci.
@@ -41,8 +41,10 @@ class Members:
 			return
 		elif (option[0] == "+") and (option[1:] != ""):
 		 	self.addMember(option[1:], dataClass, data)
-		elif (option[0] == "-") and (option[1:].isnumeric()) and (int(option[1:]) in range(len(data["members"]))):
+		elif (option[0] == "-") and (option[1:].isnumeric()) and dataClass.checkIfMemberExistsById(data["members"], option[1:]):
 			self.removeMember(option[1:], dataClass, data)
+		elif (option[0] == "*") and (option[1:].isnumeric()) and dataClass.checkIfMemberExistsById(data["members"], option[1:]):
+			self.editMember(option[1:], dataClass, data)
 		else:
 			print("""
 			Opció NO vàlida!""")
@@ -51,16 +53,46 @@ class Members:
 		self.manageMembers(dataClass, data)
 
 	def addMember(self, newMember, dataClass, data):
-		data["members"] += [newMember]
+		data["members"] += [{"id": self.addNewId(data), "name": newMember, "phone": ""}]
 		dataClass.saveData(data)
 		print("""
 			Soci {} afegit!""".format(newMember))
 
+	def addNewId(self, data):
+		if data["members"] == []:
+			return 1
+		return (data["members"][-1]["id"] + 1)
+
 	def removeMember(self, id, dataClass, data):
 		print("""
-			Soci {} el·liminat!""".format(data["members"][int(id)]))
-		del data["members"][int(id)]
+			Soci {} el·liminat!""".format(dataClass.getMemberById(data["members"], id)["name"]))
+		for index in range(len(data["members"])):
+			if data["members"][index]['id'] == int(id):
+				del data["members"][index]
+				break
 		dataClass.saveData(data)
 
-	def editMember(self):
-		pass
+	def editMember(self, id, dataClass, data):
+		print("""
+			Vol modificar el soci {}. {}!""".format(id, dataClass.getMemberById(data["members"], id)["name"]))
+		name = input("""
+		Escriu el nou Nom Cognom o prem ENTER per deixar-ho com està: """)
+		phone = input("""
+		Escriu el nou Núm. de Telèfon o prem ENTER per deixar-ho com està: """)
+		for index in range(len(data["members"])):
+			if data["members"][index]['id'] == int(id):
+				if name != "":
+					data["members"][index]["name"] = name
+					print("""
+			Nom Cognom modificat correctament: {}.""".format(name))
+				if phone != "":
+					if len(phone) == 9:
+						data["members"][index]["phone"] = phone
+						print("""
+			Telèfon modificat correctament: {}.""".format(phone))
+					else:
+						print("""
+			La llargada del Telèfon {} és incorrecta""".format(phone))
+				time.sleep(2)
+				break
+		dataClass.saveData(data)

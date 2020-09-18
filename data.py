@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-import json, os
+import json, os, time
 
 class Data:
 
 	def __init__(self):
+		self.initData()
 		# self.resetData()
-		self.data = self.readData()
+		# self.data = self.readData()
 		# self.showDataPretty()
 		# self.data["prova"] = []
 		# self.saveData(self.data)
@@ -16,6 +17,15 @@ class Data:
 		print("""
 
 		***** DADES LOCALS | CLUB TENNIS SANTPEDOR *****""")
+
+	def initData(self):
+		if not os.path.exists('dasta.txt'):
+			self.resetData()
+			os.system('clear')
+			print("""
+			Fitxer de dades creat!""")
+			time.sleep(2)
+
 
 	def readData(self):
 		with open('data.txt') as json_file:
@@ -28,9 +38,6 @@ class Data:
 			json.dump(data, outfile)
 			outfile.close()
 
-	def getData(self):
-		return self.data
-
 	def resetData(self):
 		data = {}
 		data["menu-options"] = [
@@ -42,10 +49,11 @@ class Data:
 				]
 			]
 		]
-		data["members"] = []
+		data["members"] = [] # [{id: 0, name: "player 1", phone: "123456789"}, {id: 1, name: "player 2", phone: "987654321"}]
+		data["actual-rank"] = [] # [id, id, id, ...]
 		data["tournaments"] = []
 
-		with open('data.txt', 'w') as outfile:
+		with open('dasta.txt', 'w') as outfile:
 			json.dump(data, outfile)
 			outfile.close()
 
@@ -56,16 +64,24 @@ class Data:
 		input("""
 		Prem ENTER per continuar: """)
 
+	def getMemberById(self, members, id):
+		return(next((member for member in members if member["id"] == int(id)), None))
 
-# storage = {
+	def checkIfMemberExistsById(self, members, id):
+		if next((member for member in members if member["id"] == int(id)), None) == None:
+			return False
+		return True
+
+# data = {
 # 	"menu-options": [
 # 		"Sortir!",
 # 		"Gestionar Socis"
 # 	],
 # 	"members": ["PLAYER 1", "PLAYER 2", "PLAYER 3", "PLAYER 4"],
+#	"actual-rank": [id, id, id, ...]
 # 	"tournaments": {
 # 		"especial-2020": {
-# 			"players": ["PLAYER 1", "PLAYER 2", "PLAYER 3"],
+# 			"players": [id, id, id, ...],
 # 			"groups": ["GROUP1", "GROUP2"]
 # 		}
 # 	}
