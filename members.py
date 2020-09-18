@@ -28,14 +28,16 @@ class Members:
 	def manageMembers(self, dataClass, data):
 		os.system('clear')
 		self.title()
+		print("""
+				Total Socis: {}""".format(len(data["members"])))
 		for member in data["members"]:
 			print("""
-			{}. {} - {}""".format(member["id"], member["name"], member["phone"]))
+			{}({}) - {}""".format(member["name"], member["id"], member["phone"]))
 
 		option = input("""
 		Escriu +Nom Cognom per afegir un soci.
-		Escriu -ID per el·liminar un socis.
-		Escriu *ID per modificar el nom d'un soci.
+		Escriu -(ID) per el·liminar un socis.
+		Escriu *(ID) per modificar el nom d'un soci.
 		Prem ENTER per continuar: """)
 		if option == "":
 			return

@@ -67,6 +67,9 @@ class Data:
 	def getMemberById(self, members, id):
 		return(next((member for member in members if member["id"] == int(id)), None))
 
+	def getMemberByName(self, members, name):
+		return(next((member for member in members if member["name"] == name), None))
+
 	def checkIfMemberExistsById(self, members, id):
 		if next((member for member in members if member["id"] == int(id)), None) == None:
 			return False
