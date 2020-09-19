@@ -42,11 +42,21 @@ class Data:
 				]
 			],
 			["Gestionar Torneigs", [
-				"Tornar al Menú Principal",
-				"Gestionar Rànquing",
-				"Veure Informació d'un Torneig",
-				"Crear Torneig"
-				]
+				["Tornar al Menú Principal"],
+				["Gestionar Rànquing"],
+				["Gestionar Torneig", [
+					"Tornar al Menú Anterior",
+					"Gestionar Grups",
+					"Gestionar Eliminatories"
+					]
+				],
+				["Crear Torneig", [
+					"Tornar al Menú Anterior",
+					"Crear Grups",
+					"Crear El·liminatories"
+					]
+				],
+				["El·liminar Torneig"]]
 			]
 		]
 		data["members"] = [] # [{id: 0, name: "player 1", phone: "123456789"}, {id: 1, name: "player 2", phone: "987654321"}]
@@ -74,6 +84,12 @@ class Data:
 		if next((member for member in members if member["id"] == int(id)), None) == None:
 			return False
 		return True
+
+	def checkifTournamentExists(self, tournaments, tournamentName):
+		for tournament in tournaments:
+			if next(iter(tournament)) == tournamentName:
+				return True
+		return False
 
 # data = {
 # 	"menu-options": [
