@@ -67,10 +67,10 @@ class Data:
 			json.dump(data, outfile)
 			outfile.close()
 
-	def showDataPretty(self):
+	def showDataPretty(self, data):
 		os.system('clear')
 		self.title()
-		print(json.dumps(self.data, indent=8))
+		print(json.dumps(data, indent=8))
 		input("""
 		Prem ENTER per continuar: """)
 
@@ -90,6 +90,71 @@ class Data:
 			if next(iter(tournament)) == tournamentName:
 				return True
 		return False
+
+	def checkIfListIsEmpty(self, list):
+		for i in list:
+			if i:
+				return False
+		return True
+
+	def getTournamentIdByName(self, dataClass, data, tournamentName):
+		return(next((index for (index, tournament) in enumerate(data["tournaments"]) if next(iter(tournament)) == tournamentName), None))
+
+	def addMembersToTournament(self, dataClass, data, tournamentName):
+		os.system('clear')
+		signedMembers = data["tournaments"][dataClass.getTournamentIdByName(dataClass, data, tournamentName)][tournamentName]["signedMembers"]
+		print("""
+                **** CREANT INSCRIPCIONS A "{}" - CLUB TENNIS SANTPEDOR ****""".format(tournamentName))
+
+		infoMembers = ""
+		for member in data["members"]:
+			infoMember = "{}({})     ".format(member["name"], member["id"])
+			infoMembers = infoMembers + infoMember
+		print("""
+				*** Llistat de Sòcis | Total: {} ***
+
+	{}""".format(len(data["members"]), infoMembers))
+		print("""
+				**** SOCIS INSCRITS A "{}" - CLUB TENNIS SANTPEDOR ****""".format(tournamentName))
+		print("""
+							Total Socis Inscrits: {}""".format(len(signedMembers)))
+		for memberId in signedMembers:
+			print("""
+					{}({})""".format(dataClass.getMemberById(data["members"], memberId)["name"], dataClass.getMemberById(data["members"], memberId)["id"]))
+
+		memberId = input("""
+		Escriu (ID) per inscriure un soci al torneig!.
+		Escriu -(ID) per esborrar un soci del torneig!.
+		Escriu OK per finalitzar i crear grups: """)
+		if memberId == "":
+			self.addMembersToTournament(dataClass, data, tournamentName)
+		elif not memberId.isnumeric() and memberId.upper() == "OK":
+			return signedMembers
+		elif memberId.isnumeric() and dataClass.checkIfMemberExistsById(data["members"], memberId):
+			if int(memberId) in signedMembers:
+				print("""
+					El soci {} ja està inscrit al torneig!""".format(self.getMemberById(data["members"], memberId)["name"]))
+			else:
+				print("""
+					Soci {} inscrit al torneig!""".format(self.getMemberById(data["members"], memberId)["name"]))
+				data["tournaments"][dataClass.getTournamentIdByName(dataClass, data, tournamentName)][tournamentName]["signedMembers"] += [int(memberId)]
+				dataClass.saveData(data)
+		elif (memberId[0] == "-") and (memberId[1:].isnumeric()) and dataClass.checkIfMemberExistsById(data["members"], memberId[1:]):
+			if int(memberId[1:]) in signedMembers:
+				print("""
+					Soci {} esborrat del torneig!""".format(self.getMemberById(data["members"], memberId[1:])["name"]))
+				signedMemberIndex = signedMembers.index(int(memberId[1:]))
+				del signedMembers[signedMemberIndex]
+			else:
+				print("""
+					El soci {} no està inscrit al torneig!""".format(self.getMemberById(data["members"], memberId[1:])["name"]))
+		else:
+			print("""
+					Opció NO vàlida!""")
+		time.sleep(1)
+
+
+		self.addMembersToTournament(dataClass, data, tournamentName)
 
 # data = {
 # 	"menu-options": [

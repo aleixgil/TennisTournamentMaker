@@ -67,7 +67,7 @@ class Members:
 		else:
 			print("""
 			La llargada del Telèfon {} és incorrecta. No s'ha afegit cap Telèfon!""".format(phone))
-		time.sleep(2)
+		time.sleep(1)
 
 	def addNewId(self, data):
 		if data["members"] == []:

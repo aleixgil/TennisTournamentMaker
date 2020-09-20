@@ -1,4 +1,4 @@
-import os, time
+import os, time, random
 
 class Tournaments:
 
@@ -47,9 +47,9 @@ class Tournaments:
                     **** RÀNQUING - CLUB TENNIS SANTPEDOR ****""")
         print("""
                             Total Socis al Rànquing: {}""".format(len(data["rank"])))
-        for index, member in enumerate(data["rank"]):
+        for index, memberId in enumerate(data["rank"]):
             print("""
-                        {}. {}({})""".format(index+1, member, dataClass.getMemberByName(data["members"], member)["id"]))
+                        {}. {}({})""".format(index+1, dataClass.getMemberById(data["members"], memberId)["name"], dataClass.getMemberById(data["members"], memberId)["id"]))
 
         option = input("""
 		Escriu +(ID) per afegir un soci al rànquing.
@@ -72,16 +72,16 @@ class Tournaments:
         self.manageRank(dataClass, data)
 
     def addRankMember(self, id, dataClass, data):
-        memberName = dataClass.getMemberById(data["members"], id)["name"]
-        if memberName in data["rank"]:
+        memberId = dataClass.getMemberById(data["members"], id)["id"]
+        if memberId in data["rank"]:
             print("""
-                    ERROR! El soci {} ja està al Rànquing!""".format(memberName))
+                    ERROR! El soci {} ja està al Rànquing!""".format(dataClass.getMemberById(data["members"], id)["name"]))
             time.sleep(1)
         else:
-            data["rank"] += [memberName]
+            data["rank"] += [memberId]
             dataClass.saveData(data)
             print("""
-                    Soci {} afegit al Rànquing!""".format(memberName))
+                    Soci {} afegit al Rànquing!""".format(dataClass.getMemberById(data["members"], id)["name"]))
 
     def removeRankMember(self, id, dataClass, data):
         memberName = dataClass.getMemberById(data["members"], id)["name"]
@@ -100,12 +100,12 @@ class Tournaments:
         newPosition = input("""
                 Indica a quina posició vols canviar al Soci {}: """.format(memberName))
         if newPosition.isnumeric() and (0 < int(newPosition) <= len(data["rank"])):
-            oldPosition = data["rank"].index(memberName)
+            oldPosition = data["rank"].index(dataClass.getMemberByName(data["members"], memberName)["id"])
             del data["rank"][oldPosition]
-            data["rank"].insert(int(newPosition)-1, memberName)
+            data["rank"].insert(int(newPosition)-1, dataClass.getMemberByName(data["members"], memberName)["id"])
             dataClass.saveData(data)
             print("""
-                    Posició del Soci {} canviada de {} -> {}!""".format(memberName, oldPosition, newPosition))
+                    Posició del Soci {} canviada de {} -> {}!""".format(memberName, oldPosition+1, newPosition))
         else:
             print("""
                     ERROR! No existeix aquesta posició!""")
@@ -135,8 +135,9 @@ class Tournaments:
 
             if currentTournamentIndex.isnumeric() and (0 <= int(currentTournamentIndex) < len(data["tournaments"])):
                 tournament = data["tournaments"][int(currentTournamentIndex)]
+                tournamentName = next(iter(tournament))
                 print("""
-                        Has seleccionat el torneig {}!""".format(next(iter(tournament))))
+                        Has seleccionat el torneig {}!""".format(tournamentName))
             else:
                 print("""
                             Opció NO vàlida!""")
@@ -151,7 +152,7 @@ class Tournaments:
                         El torneig {} ja existeix!""".format(tournamentName))
                 time.sleep(1)
                 return 1
-            tournament = { tournamentName: { "groups": {}, "brackets": {}} }
+            tournament = { tournamentName: { "signedMembers": [], "groups": [], "brackets": [] } }
             data["tournaments"] += [tournament]
             print("""
                         Torneig {} creat!""".format(tournamentName))
@@ -169,7 +170,8 @@ class Tournaments:
             option = input("""
                     Selecciona una opció: """)
             if option == '1':
-                self.createGroups(self, dataClass, data, tournament)
+                self.createGroups(dataClass, data, tournamentName)
+                dataClass.saveData(data)
                 return 1
             elif option == '0':
                 dataClass.saveData(data)
@@ -181,9 +183,70 @@ class Tournaments:
 
         self.createTournamentMenu(dataClass, data)
 
-    def createGroups(self, dataClass, data, tournament):
+    def createGroups(self, dataClass, data, tournamentName):
+        if data["tournaments"][dataClass.getTournamentIdByName(dataClass, data, tournamentName)][tournamentName]["groups"] != []:
+            print("""
+                    El torneig ja conté aquests grups:""")
+            print(dataClass.showDataPretty(data["tournaments"][dataClass.getTournamentIdByName(dataClass, data, tournamentName)][tournamentName]["groups"]))
+            option = input("""
+                    Segur que vol continuar(y/n)?: """)
+            if option != "y":
+                print("""
+                    Operació cancel·lada!""")
+                time.sleep(1)
+                return 1
+        dataClass.addMembersToTournament(dataClass, data, tournamentName)
+        self.orderedSignedMembers(dataClass, data, tournamentName)
+        self.makeGroups(dataClass, data, tournamentName)
+        # self.manageGroups(dataClass, data, tournamentName) show grups
+
+    def makeGroups(self, dataClass, data, tournamentName):
         os.system('clear')
-        self.title()
+        print("""
+                **** CREANT GRUPS... TORNEIG "{}" - CLUB TENNIS SANTPEDOR ****""".format(tournamentName))
+        signedMembers = data["tournaments"][dataClass.getTournamentIdByName(dataClass, data, tournamentName)][tournamentName]["signedMembers"]
+        print("""
+                            Nombre de Participants: {}""".format(len(signedMembers)))
+        numberOfGroups = input("""
+                    Quants grups vols?: """)
+        if numberOfGroups.isnumeric() and (int(numberOfGroups) <= (len(signedMembers)/2)):
+            groups = []
+            for i in range(int(numberOfGroups)):
+                groups += [[]]
+            while not dataClass.checkIfListIsEmpty(signedMembers):
+                hype = signedMembers[:int(numberOfGroups)]
+                lenHype = len(hype)
+                for i in range(int(numberOfGroups)):
+                    if i < lenHype:
+                        choice = random.choice(hype)
+                        groups[i] += [choice]
+                        hype.remove(choice)
+                signedMembers = signedMembers[int(numberOfGroups):]
+            self.insertPlayersInGroups(dataClass, data, tournamentName, groups)
+        else:
+            print("""
+                            Opció NO vàlida!""")
+            self.makeGroups(dataClass, data, tournamentName)
+
+    def insertPlayersInGroups(self, dataClass, data, tournamentName, groups):
+        tournamentGroupsContent = []
+        for idGroup, group in enumerate(groups):
+            data["tournaments"][dataClass.getTournamentIdByName(dataClass, data, tournamentName)][tournamentName]["groups"] += [ { idGroup+1: { "players": group, "stats": [], "results": [] } } ]
+        print(data["tournaments"][dataClass.getTournamentIdByName(dataClass, data, tournamentName)][tournamentName]["groups"])
+        dataClass.saveData(data)
+
+    def orderedSignedMembers(self, dataClass, data, tournamentName):
+        orderedSignedMembers = []
+        signedMembers = data["tournaments"][dataClass.getTournamentIdByName(dataClass, data, tournamentName)][tournamentName]["signedMembers"]
+        for rankMemberId in data["rank"]:
+            if rankMemberId in signedMembers:
+                orderedSignedMembers += [rankMemberId]
+                signedMemberIndex = signedMembers.index(rankMemberId)
+                del signedMembers[signedMemberIndex]
+        for signedMember in signedMembers:
+            orderedSignedMembers += [signedMember]
+        data["tournaments"][dataClass.getTournamentIdByName(dataClass, data, tournamentName)][tournamentName]["signedMembers"] = orderedSignedMembers
+        dataClass.saveData(data)
 
     def titleRemoveTournament(self):
         print("""
